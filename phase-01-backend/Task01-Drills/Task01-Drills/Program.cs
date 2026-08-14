@@ -20,8 +20,23 @@ namespace Task01_Drills
             //OddEven04.Analyzer();
 
             //task05
-            MaxMin.Finder();
+            //MaxMin.Finder();
 
+            //task06
+            //WordCounter06.Counter();
+
+            //task07
+            //NameFormatter07.Formatter();
+
+            //task08
+            //PasswordStrengthChecker08.Checker();
+
+            //task09
+            //ShoppingCartTotal09.Calculate();
+
+            //task10
+            ATMMenu.Run();
         }
 
     }
+}
