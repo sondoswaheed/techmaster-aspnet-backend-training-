@@ -2,7 +2,7 @@
 
 ## Student Information
 
-- Name: Sondos
+- Name: Sondos waheed ali ahmed
 - Track: ASP.NET Backend Career Training
 - Phase: Phase 01 - Backend Foundations
 
