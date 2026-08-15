@@ -47,7 +47,26 @@ namespace Task01_Drills
             //PalindromeChecker13.Check();
 
             //task14
-            SimpleExpenseTracker14.Track();
+            //SimpleExpenseTracker14.Track();
+
+            // task15
+            //ArrayRotation15.Rotate();
+
+            //task16
+            //FrequencyCounter16.CountFrequency();
+
+            //task17
+            //SimpleSearchEngine17.Search();
+
+            //task18
+            //NumberStatistics18.Analyze();
+
+            //task19
+            SimpleTicketPriceCalculator19.Calculate();
+
+            //task20
+
+
         }
 
     }
