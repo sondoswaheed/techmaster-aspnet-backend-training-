@@ -35,7 +35,19 @@ namespace Task01_Drills
             //ShoppingCartTotal09.Calculate();
 
             //task10
-            ATMMenu.Run();
+            //ATMMenu.Run();
+
+            //task11
+            //DuplicateNumberDetector11.Detector();
+
+            //task12
+            //EmailValidator12.Validate();
+
+            //task13
+            //PalindromeChecker13.Check();
+
+            //task14
+            SimpleExpenseTracker14.Track();
         }
 
     }
