@@ -4,9 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DebugRefactor.Services
+namespace DebugRefactor.Models
 {
-    internal class OrderCalculator
+
+    public enum CustomerType
     {
+        Regular,
+        Silver,
+        Gold,
+        VIP
     }
 }

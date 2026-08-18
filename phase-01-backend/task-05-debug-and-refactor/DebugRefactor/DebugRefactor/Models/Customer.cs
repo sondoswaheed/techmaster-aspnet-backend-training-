@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace DebugRefactor.Models
 {
-    internal class Customer
+    public class Customer
     {
+        public string Name { get; set; }
+        public CustomerType Type { get; set; }
     }
 }
