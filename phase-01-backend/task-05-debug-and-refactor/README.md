@@ -41,8 +41,7 @@ OrderCalculator
 ├── UI
 │   └── ConsoleMenu.cs
 │
-├── Original
-│   └── Program.cs
+├── Program.cs
 │
 ├── Program.cs
 └── README.md
