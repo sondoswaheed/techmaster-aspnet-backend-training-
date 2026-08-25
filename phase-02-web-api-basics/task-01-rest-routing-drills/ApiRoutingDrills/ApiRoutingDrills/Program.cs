@@ -1,4 +1,7 @@
 
+using ApiRoutingDrills.Services;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace ApiRoutingDrills
 {
     public class Program
@@ -13,7 +16,7 @@ namespace ApiRoutingDrills
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            builder.Services.AddScoped<ConverterService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
