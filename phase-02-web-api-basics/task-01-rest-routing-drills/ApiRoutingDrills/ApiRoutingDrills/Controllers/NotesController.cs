@@ -27,9 +27,39 @@ namespace ApiRoutingDrills.Controllers
         } 
 
         [HttpGet]
-        public IActionResult GetAll()
+        //pagination
+        public IActionResult GetAll([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            return Ok(Notes);
+            if (pageNumber <= 0)
+            {
+                return BadRequest(new
+                {
+                    message = "Page number must be greater than 0"
+                });
+            }
+
+            if (pageSize < 1 || pageSize > 50)
+            {
+                return BadRequest(new
+                {
+                    message = "Page size must be between 1 and 50"
+                });
+            }
+
+            var totalCount = Notes.Count;
+
+            var items = Notes
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(new
+            {
+                items = items,
+                pageNumber = pageNumber,
+                pageSize = pageSize,
+                totalCount = totalCount
+            });
         }
 
         [HttpGet("{id}")]
