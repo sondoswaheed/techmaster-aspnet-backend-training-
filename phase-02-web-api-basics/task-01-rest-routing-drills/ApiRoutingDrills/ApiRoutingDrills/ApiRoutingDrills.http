@@ -1,0 +1,6 @@
+@ApiRoutingDrills_HostAddress = http://localhost:5193
+
+GET {{ApiRoutingDrills_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
