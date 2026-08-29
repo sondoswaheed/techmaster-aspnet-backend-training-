@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using ProductsCategoriesApi.DTOs;
 using ProductsCategoriesApi.Services;
@@ -32,12 +32,7 @@ namespace ProductsCategoriesApi.Controllers
             }
         }
 
-        [HttpGet]
-        public IActionResult GetProducts()
-        {
-            var products = _productService.GetAll();
-            return Ok(products);
-        }
+        
 
 
         [HttpPut("{id}")]
@@ -96,6 +91,42 @@ namespace ProductsCategoriesApi.Controllers
             {
                 message = "Product marked as unavailable successfully"
             });
+        }
+
+        [HttpGet]
+        public IActionResult GetProducts(string? name, int? categoryId, decimal? minPrice, decimal? maxPrice, bool? isAvailable, bool? lowStock)
+        {
+            var product = _productService.SearchByName(name, categoryId, minPrice, maxPrice, isAvailable, lowStock);
+            return Ok(product);
+        }
+
+        [HttpGet("reports/stock-value")]
+        public IActionResult StockReports()
+        {
+            var reports = _productService.StockReport();
+            return Ok(reports);
+        }
+
+        [HttpPatch("{id}/stock")]
+        public IActionResult UpdateStockQuantiy(int id, UpdateStockRequest request)
+        {
+            var stock = _productService.UpdateStock(id, request);
+            if (stock == null)
+            {
+                return NotFound(new
+                {
+                    message="product not found"
+                });
+            }
+            return Ok(stock);
+        }
+
+        [HttpGet("low-stock")]
+        public IActionResult LowStock()
+        {
+            var stock=_productService.LowStock();
+            
+            return Ok(stock);
         }
     }
 }
