@@ -90,16 +90,6 @@ task-06-api-standards-refactor-pack/
     └── Program.cs
 ```
 
-## Validation
-
-The `CreateProductRequest` DTO uses Data Annotations to validate incoming data.
-
-Examples:
-
-* Product name is required.
-* Price cannot be negative.
-* Stock cannot be negative.
-
 ## What I Learned
 
 This refactoring showed me why separating responsibilities makes an API easier to maintain.
