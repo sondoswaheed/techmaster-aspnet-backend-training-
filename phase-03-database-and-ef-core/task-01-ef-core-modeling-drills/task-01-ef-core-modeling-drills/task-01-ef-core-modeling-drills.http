@@ -1,0 +1,6 @@
+@task_01_ef_core_modeling_drills_HostAddress = http://localhost:5035
+
+GET {{task_01_ef_core_modeling_drills_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
