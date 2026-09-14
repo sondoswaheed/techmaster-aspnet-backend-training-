@@ -8,5 +8,8 @@
         public DateTime CreatedAt { get; set; }
         public bool IsActive  { get; set; }
         public StudentProfile studentProfile { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public ICollection<Enrollment> Enrollments { get; set; }=new List<Enrollment>();
     }
 }

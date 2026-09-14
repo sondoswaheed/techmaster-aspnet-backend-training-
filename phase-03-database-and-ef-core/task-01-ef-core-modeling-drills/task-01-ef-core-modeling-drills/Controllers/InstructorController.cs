@@ -26,19 +26,7 @@ namespace task_01_ef_core_modeling_drills.Controllers
                 });
             }
 
-            return Ok(new
-            {
-                instructor.Id,
-                instructor.Name,
-                instructor.Email,
-                instructor.PhoneNumber,
-                Tracks = instructor.TrainingTracks.Select(t => new
-                {
-                    t.Id,
-                    t.Title,
-                    t.InstructorId
-                })
-            });
+            return Ok(instructor);
         }
     }
 }

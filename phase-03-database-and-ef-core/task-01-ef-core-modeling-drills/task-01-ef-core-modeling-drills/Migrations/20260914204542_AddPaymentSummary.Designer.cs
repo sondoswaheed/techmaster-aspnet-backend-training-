@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using task_01_ef_core_modeling_drills.Data;
 
@@ -11,9 +12,11 @@ using task_01_ef_core_modeling_drills.Data;
 namespace task_01_ef_core_modeling_drills.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260914204542_AddPaymentSummary")]
+    partial class AddPaymentSummary
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,31 +73,6 @@ namespace task_01_ef_core_modeling_drills.Migrations
                             Status = 1,
                             StudentId = 1,
                             TrainingTrackId = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            EnrollmentDate = new DateTime(2026, 9, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Status = 0,
-                            StudentId = 2,
-                            TrainingTrackId = 2
-                        },
-                        new
-                        {
-                            Id = 4,
-                            EnrollmentDate = new DateTime(2026, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FinalGrade = 95m,
-                            Status = 1,
-                            StudentId = 3,
-                            TrainingTrackId = 3
-                        },
-                        new
-                        {
-                            Id = 5,
-                            EnrollmentDate = new DateTime(2026, 9, 12, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Status = 0,
-                            StudentId = 4,
-                            TrainingTrackId = 1
                         });
                 });
 
@@ -129,13 +107,6 @@ namespace task_01_ef_core_modeling_drills.Migrations
                             Email = "mohamed@gmail.com",
                             Name = "Mohammed ahmed",
                             PhoneNumber = "01087655678"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "sara.hassan@gmail.com",
-                            Name = "Sara Hassan",
-                            PhoneNumber = "01123456789"
                         });
                 });
 
@@ -181,9 +152,6 @@ namespace task_01_ef_core_modeling_drills.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -193,9 +161,6 @@ namespace task_01_ef_core_modeling_drills.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
@@ -209,44 +174,7 @@ namespace task_01_ef_core_modeling_drills.Migrations
                             CreatedAt = new DateTime(2026, 7, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "Sonds@gmail.com",
                             FullName = "Sondos waheed",
-                            IsActive = true,
-                            IsDeleted = false
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "omar.ali@gmail.com",
-                            FullName = "Omar Ali",
-                            IsActive = true,
-                            IsDeleted = false
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2026, 8, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "nour.m@gmail.com",
-                            FullName = "Nour Mahmoud",
-                            IsActive = true,
-                            IsDeleted = true
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CreatedAt = new DateTime(2026, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "youssef.i@gmail.com",
-                            FullName = "Youssef Ibrahim",
-                            IsActive = true,
-                            IsDeleted = false
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CreatedAt = new DateTime(2026, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "mariam.k@gmail.com",
-                            FullName = "Mariam Khaled",
-                            IsActive = false,
-                            IsDeleted = false
+                            IsActive = true
                         });
                 });
 
@@ -292,42 +220,6 @@ namespace task_01_ef_core_modeling_drills.Migrations
                             EmergencyPhone = "01063500543",
                             NationalId = "98464748493033",
                             StudentId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Address = "Nasr City, Cairo",
-                            DateOfBirth = new DateOnly(1999, 1, 1),
-                            EmergencyPhone = "01011112222",
-                            NationalId = "29901011234567",
-                            StudentId = 2
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Address = "Maadi, Cairo",
-                            DateOfBirth = new DateOnly(2001, 5, 5),
-                            EmergencyPhone = "01033334444",
-                            NationalId = "30105051234568",
-                            StudentId = 3
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Address = "Giza",
-                            DateOfBirth = new DateOnly(1998, 11, 11),
-                            EmergencyPhone = "01055556666",
-                            NationalId = "29811111234569",
-                            StudentId = 4
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Address = "Alexandria",
-                            DateOfBirth = new DateOnly(2002, 3, 3),
-                            EmergencyPhone = "01077778888",
-                            NationalId = "30203031234570",
-                            StudentId = 5
                         });
                 });
 
@@ -364,12 +256,6 @@ namespace task_01_ef_core_modeling_drills.Migrations
                             Id = 2,
                             InstructorId = 1,
                             Title = "Backend"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            InstructorId = 2,
-                            Title = "UI/UX Design"
                         });
                 });
 

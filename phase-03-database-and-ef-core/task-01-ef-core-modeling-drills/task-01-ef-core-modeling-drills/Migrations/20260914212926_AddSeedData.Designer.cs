@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using task_01_ef_core_modeling_drills.Data;
 
@@ -11,9 +12,11 @@ using task_01_ef_core_modeling_drills.Data;
 namespace task_01_ef_core_modeling_drills.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260914212926_AddSeedData")]
+    partial class AddSeedData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -181,9 +184,6 @@ namespace task_01_ef_core_modeling_drills.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -193,9 +193,6 @@ namespace task_01_ef_core_modeling_drills.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
@@ -209,8 +206,7 @@ namespace task_01_ef_core_modeling_drills.Migrations
                             CreatedAt = new DateTime(2026, 7, 18, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "Sonds@gmail.com",
                             FullName = "Sondos waheed",
-                            IsActive = true,
-                            IsDeleted = false
+                            IsActive = true
                         },
                         new
                         {
@@ -218,8 +214,7 @@ namespace task_01_ef_core_modeling_drills.Migrations
                             CreatedAt = new DateTime(2026, 8, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "omar.ali@gmail.com",
                             FullName = "Omar Ali",
-                            IsActive = true,
-                            IsDeleted = false
+                            IsActive = true
                         },
                         new
                         {
@@ -227,8 +222,7 @@ namespace task_01_ef_core_modeling_drills.Migrations
                             CreatedAt = new DateTime(2026, 8, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "nour.m@gmail.com",
                             FullName = "Nour Mahmoud",
-                            IsActive = true,
-                            IsDeleted = true
+                            IsActive = true
                         },
                         new
                         {
@@ -236,8 +230,7 @@ namespace task_01_ef_core_modeling_drills.Migrations
                             CreatedAt = new DateTime(2026, 8, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "youssef.i@gmail.com",
                             FullName = "Youssef Ibrahim",
-                            IsActive = true,
-                            IsDeleted = false
+                            IsActive = true
                         },
                         new
                         {
@@ -245,8 +238,7 @@ namespace task_01_ef_core_modeling_drills.Migrations
                             CreatedAt = new DateTime(2026, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "mariam.k@gmail.com",
                             FullName = "Mariam Khaled",
-                            IsActive = false,
-                            IsDeleted = false
+                            IsActive = false
                         });
                 });
 

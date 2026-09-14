@@ -22,6 +22,9 @@ namespace task_01_ef_core_modeling_drills
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<IInstructorService,InstructorService>();
+            builder.Services.AddScoped<IStudentService,StudentService>();
+            builder.Services.AddScoped<ITrackService, TrackService>();
+            builder.Services.AddScoped<IEnrollmentService,EnrollmentService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
