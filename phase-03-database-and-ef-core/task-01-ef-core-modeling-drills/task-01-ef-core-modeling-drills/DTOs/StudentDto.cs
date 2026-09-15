@@ -10,6 +10,8 @@ namespace task_01_ef_core_modeling_drills.DTOs
         public bool IsActive { get; set; }
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public ICollection<EnrollmentDto> Enrollments { get; set; } 
     }
 }

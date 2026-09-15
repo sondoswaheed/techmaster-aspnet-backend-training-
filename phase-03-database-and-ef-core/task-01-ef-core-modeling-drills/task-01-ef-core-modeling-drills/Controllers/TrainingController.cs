@@ -24,5 +24,12 @@ namespace task_01_ef_core_modeling_drills.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet]
+        public IActionResult GetTracks()
+        {
+            var result = _trackService.Details();
+            return Ok(result);
+        }
     }
 }

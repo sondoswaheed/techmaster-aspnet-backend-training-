@@ -23,6 +23,21 @@ namespace task_01_ef_core_modeling_drills.Services
 
             return MapToResponse(result);
         }
+
+
+       public List<TrackDetailsDto> Details()
+        {
+            var track = _context.TrainingTracks.Select(f => new TrackDetailsDto
+            {
+                Id = f.Id,
+                Title = f.Title
+            }).ToList();
+
+            return track;
+        }
+
+
+
         protected TrainingTrackDto MapToResponse(TrainingTrack track)
         {
             return new TrainingTrackDto

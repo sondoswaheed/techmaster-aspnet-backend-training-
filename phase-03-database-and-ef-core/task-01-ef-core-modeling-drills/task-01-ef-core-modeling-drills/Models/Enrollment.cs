@@ -14,7 +14,6 @@ namespace task_01_ef_core_modeling_drills.Models
 
         public int StudentId { get; set; }
         public Student Student { get; set; }
-
         public int TrainingTrackId { get; set; }
         public TrainingTrack TrainingTrack { get; set; }
         public PaymentSummary PaymentSummary { get; set; }

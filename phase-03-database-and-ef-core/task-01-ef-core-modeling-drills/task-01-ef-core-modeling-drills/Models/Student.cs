@@ -6,6 +6,7 @@
         public string FullName { get; set; }
         public string Email { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public bool IsActive  { get; set; }
         public StudentProfile studentProfile { get; set; }
         public bool IsDeleted { get; set; }

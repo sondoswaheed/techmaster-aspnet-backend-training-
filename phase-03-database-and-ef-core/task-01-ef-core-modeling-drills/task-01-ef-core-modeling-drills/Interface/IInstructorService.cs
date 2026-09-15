@@ -5,6 +5,9 @@ namespace task_01_ef_core_modeling_drills.Interface
 {
     public interface IInstructorService
     {
-        InstructorDto GeInstructorWithTrack(int id); 
+        InstructorDto GeInstructorWithTrack(int id);
+
+        InstructorDto Create(CreateInstructorDto dto);
+        InstructorDto Update(int id,UpdateInstructorDto dto);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using task_01_ef_core_modeling_drills.DTOs;
 using task_01_ef_core_modeling_drills.Interface;
 
 namespace task_01_ef_core_modeling_drills.Controllers
@@ -28,5 +29,29 @@ namespace task_01_ef_core_modeling_drills.Controllers
 
             return Ok(instructor);
         }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id ,UpdateInstructorDto dto)
+        {
+            var result=_instructorService.Update(id, dto);
+
+            if (result == null)
+                return null;
+
+            return Ok(result);
+        }
+
+        [HttpPost]
+
+        public IActionResult Create(CreateInstructorDto dto)
+        {
+            var result = _instructorService.Create(dto);
+
+            if (result == null)
+                return null;
+
+            return StatusCode(201,result);
+        }
+
     }
 }
