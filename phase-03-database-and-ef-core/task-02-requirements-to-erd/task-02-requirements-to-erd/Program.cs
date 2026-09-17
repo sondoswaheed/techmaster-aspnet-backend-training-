@@ -1,6 +1,8 @@
-
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 using task_02_requirements_to_erd.Data;
+using task_02_requirements_to_erd.Interface;
+using task_02_requirements_to_erd.Services;
 
 namespace task_02_requirements_to_erd
 {
@@ -10,19 +12,33 @@ namespace task_02_requirements_to_erd
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(
+                        new JsonStringEnumConverter()
+                    );
+                });
 
-            builder.Services.AddControllers();
             builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(
-                builder.Configuration.GetConnectionString("DefaultConnection")));
-                
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection")));
+
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.UseInlineDefinitionsForEnums();
+            });
+
+            builder.Services.AddScoped<IInstructorService, InstructorService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+            builder.Services.AddScoped<ITrainingService, TrainingService>();
+            builder.Services.AddScoped<IStudentService, StudentService>();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -32,7 +48,6 @@ namespace task_02_requirements_to_erd
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

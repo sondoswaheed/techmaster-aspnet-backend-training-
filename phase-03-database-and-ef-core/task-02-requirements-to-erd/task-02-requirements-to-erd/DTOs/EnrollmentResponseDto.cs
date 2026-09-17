@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Options;
+﻿using task_02_requirements_to_erd.Models;
 using task_02_requirements_to_erd.Models.Enums;
 
-namespace task_02_requirements_to_erd.Models
+namespace task_02_requirements_to_erd.DTOs
 {
-    public class Enrollment
+    public class EnrollmentResponseDto
     {
         public int EnrollmentId { get; set; }
         public DateTime EnrollmentDate { get; set; }
@@ -13,9 +13,9 @@ namespace task_02_requirements_to_erd.Models
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public int StudentId { get; set; }
-        public Student Student { get; set; }
+        //public Student Student { get; set; }
         public int TrainingTrackId { get; set; }
-        public TrainingTrack TrainingTrack { get; set; }
+        //public TrainingTrack TrainingTrack { get; set; }
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }
 }
