@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using task_02_requirements_to_erd.Data;
 using task_02_requirements_to_erd.Interface;
@@ -36,6 +37,7 @@ namespace task_02_requirements_to_erd
             builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
             builder.Services.AddScoped<ITrainingService, TrainingService>();
             builder.Services.AddScoped<IStudentService, StudentService>();
+            builder.Services.AddScoped<IReportService, ReportService>();
 
             var app = builder.Build();
 

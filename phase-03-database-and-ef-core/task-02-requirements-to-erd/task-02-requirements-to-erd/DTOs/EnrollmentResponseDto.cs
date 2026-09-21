@@ -16,6 +16,6 @@ namespace task_02_requirements_to_erd.DTOs
         //public Student Student { get; set; }
         public int TrainingTrackId { get; set; }
         //public TrainingTrack TrainingTrack { get; set; }
-        public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+        public ICollection<PaymentResponse> Payments { get; set; } = new List<PaymentResponse>();
     }
 }

@@ -140,6 +140,7 @@ namespace task_02_requirements_to_erd.Services
         {
             return new TrainingTrackResponse
             {
+                TrainingTrackId= track.TrainingTrackId,
                 StartDate = track.StartDate,
                 EndDate = track.EndDate,
                 Capacity = track.Capacity,
