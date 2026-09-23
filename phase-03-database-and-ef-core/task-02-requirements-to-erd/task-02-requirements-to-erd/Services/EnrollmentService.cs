@@ -22,29 +22,30 @@ namespace task_02_requirements_to_erd.Services
                 throw new InvalidOperationException("Student doesn't exist");
             }
 
-            var trackExist=_context.TrainingTracks.Any(t=>t.TrainingTrackId==dto.TrainingTrackId);
+            var track= _context.TrainingTracks.FirstOrDefault(t => t.TrainingTrackId == dto.TrainingTrackId);
 
-            if(!trackExist)
+            if (track ==null)
             {
                 throw new InvalidOperationException("Training track doesn't exist");
             }
 
             var duplicate = _context.Enrollments
-                .Any(s => s.TrainingTrackId == dto.TrainingTrackId && s.StudentId == dto.StudentId);
+                .Any(s => s.TrainingTrackId == dto.TrainingTrackId 
+                && s.StudentId == dto.StudentId 
+                && s.Status== EnrollmentStatus.Active);
 
             if(duplicate)
                 throw new InvalidOperationException("Student is already enrolled in this track");
 
 
-            var enrolledCount = _context.Enrollments
-                .Count(e => e.TrainingTrackId == dto.TrainingTrackId);
+            var enrolledCount = _context.Enrollments.Count(e => e.TrainingTrackId == dto.TrainingTrackId && e.Status ==EnrollmentStatus.Active);
 
-            var track = _context.TrainingTracks
-                .FirstOrDefault(t => t.TrainingTrackId == dto.TrainingTrackId);
+          
 
-            if (track == null)
+            if (track.Status == TrainingStatus.Finished || track.Status == TrainingStatus.Cancelled)
             {
-                throw new InvalidOperationException("Training track doesn't exist");
+                throw new InvalidOperationException(
+                    "Cannot enroll in a closed track.");
             }
 
             if (enrolledCount >= track.Capacity)
@@ -55,7 +56,7 @@ namespace task_02_requirements_to_erd.Services
             var student = new Enrollment
             {
                 EnrollmentDate = dto.EnrollmentDate,
-                Status = dto.Status,
+                Status = EnrollmentStatus.Pending,
                 FinalResult = dto.FinalResult,
                 CreatedAt = DateTime.UtcNow,
                 ProgressPercentage = dto.ProgressPercentage,
@@ -147,12 +148,24 @@ namespace task_02_requirements_to_erd.Services
             if (enroll == null)
                 return null;
 
+
+
             if (!IsValidTransition(enroll.Status, status))
             {
-                throw new InvalidOperationException(
-                    $"Cannot change enrollment status from {enroll.Status} to {status}");
+                throw new InvalidOperationException( $"Cannot change enrollment status from {enroll.Status} to {status}");
             }
 
+
+            if (enroll.Status == EnrollmentStatus.Pending && status == EnrollmentStatus.Active)
+            {
+
+                var checkstatus = enroll.Payments.Any(s => s.PaymentStatus == PaymentStatus.Paid);
+
+                if (!checkstatus)
+                {
+                    throw new InvalidOperationException("can't create enrollment without paid payment");
+                }
+            }
             enroll.Status = status;
             enroll.UpdatedAt = DateTime.UtcNow;
 
@@ -189,6 +202,11 @@ namespace task_02_requirements_to_erd.Services
 
         private bool IsValidTransition(EnrollmentStatus currentStatus, EnrollmentStatus newStatus)
         {
+
+            if (currentStatus == EnrollmentStatus.Pending && newStatus == EnrollmentStatus.Active)
+                return true;
+
+
             if (currentStatus == EnrollmentStatus.Active &&
                 (newStatus == EnrollmentStatus.Completed ||newStatus == EnrollmentStatus.Cancelled))
             {

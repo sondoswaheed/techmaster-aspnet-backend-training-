@@ -59,6 +59,22 @@ namespace task_02_requirements_to_erd.Services
             }).ToList();
         }
 
+        public List<AvailableSeatsDto> AvailableSeats()
+        {
+            return _context.TrainingTracks
+                .Select(t => new AvailableSeatsDto
+                {
+                    TrainingTrackId = t.TrainingTrackId,
+                    TrackTitle = t.Title,
+                    Capacity = t.Capacity,
+                    ActiveEnrollments = t.Enrollments
+                        .Count(e => e.Status == EnrollmentStatus.Active),
+                    RemainingSeats = t.Capacity - t.Enrollments.Count(e => e.Status == EnrollmentStatus.Active)
+                })
+                .Where(t => t.RemainingSeats > 0)
+                .ToList();
+        }
+
         public RevenueSummaryDto GetRevenueSummary()
         {
             var paidPayments = _context.Payments.Where(p => p.PaymentStatus == PaymentStatus.Paid);
@@ -91,6 +107,48 @@ namespace task_02_requirements_to_erd.Services
                 .ToList();
 
             return revenue;
+        }
+
+        public List<TopTrackDto> GetTopTracks()
+        {
+            return _context.TrainingTracks.Select(s => new TopTrackDto
+            {
+                TrackTitle = s.Title,
+                TrainingTrackId = s.TrainingTrackId,
+                ActiveEnrollments = s.Enrollments.Count(d => d.Status == EnrollmentStatus.Active)
+            }).OrderByDescending(d => d.ActiveEnrollments)
+            .Take(5).ToList();
+        }
+
+        public List<InstructorWorkloadDto> GetInstructorWorkload()
+        {
+            return _context.Instructors
+                .Select(i => new InstructorWorkloadDto
+                {
+                    InstructorId = i.InstructorId,
+                    InstructorName = i.FullName,
+                    TrackCount = i.TrainingTracks.Count(),
+                    ActiveStudents = i.TrainingTracks
+                        .SelectMany(t => t.Enrollments)
+                        .Count(e => e.Status == EnrollmentStatus.Active)
+                })
+                .ToList();
+        }
+
+        public List<StudentWithoutPaymentDto> GetStudentsWithoutPayments()
+        {
+            return _context.Enrollments.Where(e =>
+                    e.Status == EnrollmentStatus.Active &&
+                    !e.Payments.Any())
+                .Select(e => new StudentWithoutPaymentDto
+                {
+                    StudentId = e.StudentId,
+                    StudentName = e.Student.FullName,
+                    Email = e.Student.Email,
+                    EnrollmentId = e.EnrollmentId,
+                    TrainingTrackId = e.TrainingTrackId
+                })
+                .ToList();
         }
     }
 }

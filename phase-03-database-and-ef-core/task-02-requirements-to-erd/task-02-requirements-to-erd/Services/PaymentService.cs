@@ -1,4 +1,5 @@
-﻿using task_02_requirements_to_erd.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using task_02_requirements_to_erd.Data;
 using task_02_requirements_to_erd.DTOs;
 using task_02_requirements_to_erd.Interface;
 using task_02_requirements_to_erd.Models;
@@ -16,11 +17,30 @@ namespace task_02_requirements_to_erd.Services
         }
         public PaymentResponse Create(CreatePaymentDto dto)
         {
-            var EnrollExist= _context.Enrollments.Any(d=>d.EnrollmentId ==dto.EnrollmentId);
+            var enrollment = _context.Enrollments
+                .Include(e => e.Payments)
+                .FirstOrDefault(e => e.EnrollmentId == dto.EnrollmentId);
 
-            if (!EnrollExist)
+            if (enrollment== null)
             {
                 throw new InvalidOperationException("Enrollment doesn't exist");
+            }
+
+            if(dto.Amount <= 0)
+            {
+                throw new InvalidOperationException("Payment amount must be positive");
+            }
+
+            var paidAmount = enrollment.Payments
+                    .Where(p => p.PaymentStatus == PaymentStatus.Paid)
+                    .Sum(p => p.Amount);
+
+
+            var remainingAmount = dto.TotalAmount - paidAmount;
+
+            if(remainingAmount < dto.Amount)
+            {
+                throw new InvalidOperationException("Payment amount exceeds the remaining amount.");
             }
 
             var pay = new Payment
@@ -31,6 +51,7 @@ namespace task_02_requirements_to_erd.Services
                 PaymentMethod= dto.PaymentMethod,
                 ReferenceNumber= dto.ReferenceNumber,
                 Notes= dto.Notes,
+                TotalAmount= dto.TotalAmount,
                 EnrollmentId= dto.EnrollmentId
             };
 
@@ -42,7 +63,6 @@ namespace task_02_requirements_to_erd.Services
 
         public List<PaymentResponse> GetAll(DateOnly? FromDate, DateOnly? ToDate, PaymentStatus? status)
         {
-
 
             var pay = _context.Payments.AsQueryable();
 
@@ -105,6 +125,7 @@ namespace task_02_requirements_to_erd.Services
                 PaymentMethod= payment.PaymentMethod,
                 ReferenceNumber= payment.ReferenceNumber,
                 Notes= payment.Notes,
+                TotalAmount= payment.TotalAmount,
                 EnrollmentId= payment.EnrollmentId,
                 PaymentId= payment.PaymentId
                 

@@ -14,5 +14,6 @@ namespace task_02_requirements_to_erd.DTOs
         public string? Notes { get; set; }
         public int EnrollmentId { get; set; }
         public Enrollment Enrollment { get; set; }
+        public decimal TotalAmount { get; set; }
     }
 }

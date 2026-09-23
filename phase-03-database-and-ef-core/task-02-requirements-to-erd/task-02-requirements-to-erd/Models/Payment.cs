@@ -11,6 +11,7 @@ namespace task_02_requirements_to_erd.Models
         public PaymentStatus PaymentStatus { get; set; }
         public string ReferenceNumber { get; set; }
         public string? Notes {  get; set; }
+        public decimal TotalAmount { get; set; }
         public int EnrollmentId {  get; set; }
         public Enrollment Enrollment { get; set; }
     }

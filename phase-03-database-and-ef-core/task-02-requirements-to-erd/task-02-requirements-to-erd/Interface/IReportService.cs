@@ -1,4 +1,6 @@
-﻿using task_02_requirements_to_erd.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using task_02_requirements_to_erd.DTOs;
+using task_02_requirements_to_erd.Models.Enums;
 
 namespace task_02_requirements_to_erd.Interface
 {
@@ -13,5 +15,14 @@ namespace task_02_requirements_to_erd.Interface
         RevenueSummaryDto GetRevenueSummary();
 
         List<RevenueByTrackDto> GetRevenueByTrack();
+
+        List<AvailableSeatsDto> AvailableSeats();
+
+        List<TopTrackDto> GetTopTracks();
+
+        public List<InstructorWorkloadDto> GetInstructorWorkload();
+
+        List<StudentWithoutPaymentDto> GetStudentsWithoutPayments();
+
     }
 }

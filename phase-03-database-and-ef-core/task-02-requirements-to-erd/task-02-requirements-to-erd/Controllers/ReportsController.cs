@@ -53,5 +53,27 @@ namespace task_02_requirements_to_erd.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("tracks-with-available-seats")]
+        public IActionResult GetTracksWithAvailableSeats()
+        {
+            var result = _reportService.AvailableSeats();
+
+            return Ok(result);
+        }
+
+        [HttpGet("top-tracks")]
+        public IActionResult GetTopTracks()
+        {
+            var result = _reportService.GetTopTracks();
+            return Ok(result);
+        }
+
+        [HttpGet("students-without-payments")]
+        public IActionResult GetStudentsWithoutPayments()
+        {
+            var result = _reportService.GetStudentsWithoutPayments();
+            return Ok(result);
+        }
     }
 }

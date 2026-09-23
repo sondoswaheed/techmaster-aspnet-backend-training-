@@ -17,6 +17,9 @@ namespace task_02_requirements_to_erd.Services
         }
         public TrainingTrackResponse Create(CreateTrackDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Title))
+                throw new InvalidOperationException("Title is required.");
+
             var instructorExists = _context.Instructors.Any(i => i.InstructorId == dto.InstructorId);
 
             if (!instructorExists)
@@ -24,6 +27,11 @@ namespace task_02_requirements_to_erd.Services
 
             if (dto.Capacity <= 0)
                 throw new InvalidOperationException( "Capacity must be greater than zero.");
+
+            if(dto.StartDate>= dto.EndDate)
+            {
+                throw new InvalidOperationException("Start date must be before the end date ");
+            }
 
             var track = new TrainingTrack
             {
@@ -111,6 +119,14 @@ namespace task_02_requirements_to_erd.Services
 
             if (track == null)
                 return null;
+
+            if (dto.StartDate >= dto.EndDate)
+            {
+                throw new InvalidOperationException("Start date must be before the end date ");
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.Title))
+                throw new InvalidOperationException("Title is required.");
 
             var instructorExists = _context.Instructors.Any(i => i.InstructorId == dto.InstructorId);
 

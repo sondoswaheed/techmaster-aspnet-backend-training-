@@ -30,9 +30,7 @@ namespace task_02_requirements_to_erd.Services
                 query = query.Where(s => s.IsActive == IsActive.Value);
             }
 
-            query = query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize);
+            query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
             var students = query.ToList();
 

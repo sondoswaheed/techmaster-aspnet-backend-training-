@@ -3,6 +3,7 @@
     public enum EnrollmentStatus
     {
         Active,
+        Pending,
         Completed,
         Cancelled
     }
