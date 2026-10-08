@@ -1,0 +1,6 @@
+@task_02_requirements_to_erd_HostAddress = http://localhost:5034
+
+GET {{task_02_requirements_to_erd_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
