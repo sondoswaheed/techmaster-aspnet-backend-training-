@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using task_02_requirements_to_erd.DTOs;
 using task_02_requirements_to_erd.Interface;
@@ -8,6 +9,7 @@ namespace task_02_requirements_to_erd.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class PaymentController : ControllerBase
     {
         private readonly IPaymentService _paymentService;
@@ -17,6 +19,7 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Get(DateOnly? FromDate, DateOnly? ToDate, PaymentStatus? status)
         {
             var pay = _paymentService.GetAll(FromDate, ToDate,status);
@@ -24,6 +27,7 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create([FromForm]CreatePaymentDto dto)
         {
             try
@@ -39,6 +43,7 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpPut("{id}/Status")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Update(int id,UpdatePaymentDto dto)
         {
             var pay= _paymentService.Update(id, dto);
@@ -50,6 +55,7 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpGet("/api/enrollments/{id}/payments")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetByEnrollmentId(int id)
         {
             try

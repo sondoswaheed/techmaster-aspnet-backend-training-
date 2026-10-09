@@ -21,5 +21,6 @@ namespace task_02_requirements_to_erd.Models
         public Instructor Instructor { get; set; }
 
         public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
+        public ICollection<TrackSession> Sessions { get; set; } = new List<TrackSession>();
     }
 }

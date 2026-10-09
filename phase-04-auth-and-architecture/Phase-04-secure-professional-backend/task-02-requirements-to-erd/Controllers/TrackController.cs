@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using task_02_requirements_to_erd.DTOs;
 using task_02_requirements_to_erd.Interface;
 using task_02_requirements_to_erd.Models.Enums;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class TracksController : ControllerBase
 {
     private readonly ITrainingService _trainingService;
@@ -15,6 +17,7 @@ public class TracksController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin, Student")]
     public IActionResult GetAll(string? keyword,int? level, EnrollmentStatus? status, int? instructorId)
     {
         var result = _trainingService.GetAll( keyword,level, status, instructorId);
@@ -23,6 +26,7 @@ public class TracksController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult Details(int id)
     {
         var result = _trainingService.Details(id);
@@ -37,6 +41,7 @@ public class TracksController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public IActionResult Create([FromForm]CreateTrackDto dto)
     {
         try
@@ -55,6 +60,7 @@ public class TracksController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult Update(int id,[FromForm] UpdateTrackDto dto)
     {
         try
@@ -79,6 +85,7 @@ public class TracksController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public IActionResult Delete(int id)
     {
         try

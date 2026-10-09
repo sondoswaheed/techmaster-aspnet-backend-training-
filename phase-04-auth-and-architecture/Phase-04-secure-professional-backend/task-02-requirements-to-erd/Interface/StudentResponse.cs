@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using task_02_requirements_to_erd.DTOs;
+using task_02_requirements_to_erd.Models;
 
 namespace task_02_requirements_to_erd.Interface
 {
@@ -17,5 +18,7 @@ namespace task_02_requirements_to_erd.Interface
         public bool IsDeleted { get; set; }
         public DateTime? DeletedAt { get; set; }
         public int TotalEnrollment { get; set; }
+
+        public int Payments { get; set; }
     }
 }

@@ -9,6 +9,10 @@ namespace task_02_requirements_to_erd.DTOs
         public string FullName { get; set; }
         [Required]
         public string Email { get; set; }
+
+        [Required]
+        [MinLength(6)]
+        public string Password { get; set; } = string.Empty;
         public string Specialization { get; set; }
         public string Bio { get; set; }
     }

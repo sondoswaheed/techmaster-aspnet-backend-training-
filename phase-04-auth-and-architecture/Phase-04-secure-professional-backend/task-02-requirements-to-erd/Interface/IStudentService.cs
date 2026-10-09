@@ -9,5 +9,10 @@ namespace task_02_requirements_to_erd.Interface
         StudentResponse Create(CreateStudentDto dto);
         StudentResponse Update(int id,UpdateStudentDto dto);
         bool Delete(int id);
+        Task<StudentResponse> GetMyProfileAsync(string userId);
+        //Task<StudentResponse> UpdateMyProfileAsync(string userId);
+        Task<List<EnrollmentResponseDto>> GetMyEnrollmentAsync(string userId);
+        Task<StudentResponse> UpdateMyProfileAsync(string userId, UpdateStudentDto request);
+        Task<List<PaymentResponse>> GetMyPayments(string userId);
     }
 }

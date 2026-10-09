@@ -1,4 +1,5 @@
 ﻿using task_02_requirements_to_erd.DTOs;
+using task_02_requirements_to_erd.Models;
 using task_02_requirements_to_erd.Models.Enums;
 namespace task_02_requirements_to_erd.Interface
 {
@@ -12,5 +13,7 @@ namespace task_02_requirements_to_erd.Interface
 
         List<EnrollmentResponseDto> GetStudentById(int id);
         List<StudentResponse> GetTracksById(int id);
+
+        Task<Enrollment> RequestEnrollmentAsync(string userId, int trainingTrackId);
     }
 }

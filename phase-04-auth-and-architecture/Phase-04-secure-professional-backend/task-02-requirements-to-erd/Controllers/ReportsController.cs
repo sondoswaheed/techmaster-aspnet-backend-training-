@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using task_02_requirements_to_erd.Interface;
 
 namespace task_02_requirements_to_erd.Controllers
 {
     [Route("api/reports")]
     [ApiController]
+    [Authorize]
     public class ReportsController : ControllerBase
     {
         private readonly IReportService _reportService;
@@ -15,6 +17,7 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpGet("dashboard-summary")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetDashboardSummary()
         {
             var result = _reportService.GetDashboardSummary();
@@ -23,6 +26,7 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpGet("unpaid-enrollments")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetUnpaidEnrollments()
         {
             var result = _reportService.GetUnpaidEnrollments();
@@ -31,6 +35,7 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpGet("track-capacity")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetTrackCapacity()
         {
             var result = _reportService.GetTrackCapacity();
@@ -39,6 +44,7 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpGet("revenue-summary")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetRevenueSummary()
         {
             var result = _reportService.GetRevenueSummary();
@@ -47,6 +53,7 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpGet("revenue-by-track")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetRevenueByTrack()
         {
             var result = _reportService.GetRevenueByTrack();
@@ -55,6 +62,7 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpGet("tracks-with-available-seats")]
+        [Authorize(Roles = "Admin,Student")]
         public IActionResult GetTracksWithAvailableSeats()
         {
             var result = _reportService.AvailableSeats();
@@ -63,6 +71,8 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpGet("top-tracks")]
+        [Authorize(Roles = "Admin")]
+
         public IActionResult GetTopTracks()
         {
             var result = _reportService.GetTopTracks();
@@ -70,6 +80,7 @@ namespace task_02_requirements_to_erd.Controllers
         }
 
         [HttpGet("students-without-payments")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetStudentsWithoutPayments()
         {
             var result = _reportService.GetStudentsWithoutPayments();

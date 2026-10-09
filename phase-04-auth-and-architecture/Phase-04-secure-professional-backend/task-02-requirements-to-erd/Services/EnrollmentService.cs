@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using task_02_requirements_to_erd.Data;
 using task_02_requirements_to_erd.DTOs;
 using task_02_requirements_to_erd.Interface;
@@ -10,9 +11,11 @@ namespace task_02_requirements_to_erd.Services
     public class EnrollmentService : IEnrollmentService
     {
         private readonly AppDbContext _context;
-        public EnrollmentService(AppDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public EnrollmentService(AppDbContext context , UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
         public EnrollmentResponseDto Create(CreateEnrollmentDto dto)
         {
@@ -215,5 +218,59 @@ namespace task_02_requirements_to_erd.Services
 
             return false;
         }
+
+        public async Task<Enrollment> RequestEnrollmentAsync(string userId, int trainingTrackId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                throw new UnauthorizedAccessException("User not found.");
+
+            if (user.StudentId == null)
+                throw new UnauthorizedAccessException( "This user is not linked to a student.");
+
+            var student = await _context.Students
+                .FirstOrDefaultAsync(s =>
+                    s.StudentId == user.StudentId && !s.IsDeleted &&  s.IsActive);
+
+            if (student == null)
+                throw new InvalidOperationException( "Student profile is inactive or unavailable.");
+
+            var track = await _context.TrainingTracks
+                .FirstOrDefaultAsync(t =>  t.TrainingTrackId == trainingTrackId && !t.IsDeleted);
+
+            if (track == null)
+                throw new KeyNotFoundException("Training track not found.");
+
+            if (track.Status != TrainingStatus.InProgress)
+                throw new InvalidOperationException( "This training track is not accepting enrollments.");
+
+            var alreadyEnrolled = await _context.Enrollments
+                .AnyAsync(e =>
+                    e.StudentId == student.StudentId &&
+                    e.TrainingTrackId == trainingTrackId &&
+                    (e.Status == EnrollmentStatus.Pending ||
+                     e.Status == EnrollmentStatus.Active));
+
+            if (alreadyEnrolled)
+                throw new InvalidOperationException( "You already have a pending or active enrollment in this track.");
+
+            var enrollment = new Enrollment
+            {
+                StudentId = student.StudentId,
+                TrainingTrackId = track.TrainingTrackId,
+                EnrollmentDate = DateTime.UtcNow,
+                Status = EnrollmentStatus.Pending,
+                ProgressPercentage = 0,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Enrollments.Add(enrollment);
+
+            await _context.SaveChangesAsync();
+
+            return enrollment;
+        }
+
     }
 }

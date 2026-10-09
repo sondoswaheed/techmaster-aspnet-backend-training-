@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using task_02_requirements_to_erd.DTOs.Auth;
 using task_02_requirements_to_erd.Interface;
+using task_02_requirements_to_erd.Services;
 
 namespace task_02_requirements_to_erd.Controllers
 {
@@ -42,7 +44,7 @@ namespace task_02_requirements_to_erd.Controllers
 
                 return Ok(result);
             }
-            catch (InvalidOperationException ex)
+            catch (UnauthorizedAccessException ex)
             {
                 return BadRequest(ex.Message);
             }
@@ -66,6 +68,7 @@ namespace task_02_requirements_to_erd.Controllers
             return Ok(result);
         }
         [HttpPost("change-Password")]
+        [Authorize]
         public async Task<IActionResult> ChangePass(ChangePasswordRequest request)
         {
             try
@@ -81,3 +84,8 @@ namespace task_02_requirements_to_erd.Controllers
         }
     }
 }
+
+
+
+
+

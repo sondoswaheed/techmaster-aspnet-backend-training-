@@ -156,29 +156,12 @@ namespace task_02_requirements_to_erd
             app.MapControllers();
 
             // Seed roles
+
             using (var scope = app.Services.CreateScope())
             {
-                var roleManager =
-                    scope.ServiceProvider
-                        .GetRequiredService<RoleManager<IdentityRole>>();
-
-                string[] roles =
-                {
-                    "Admin",
-                    "Instructor",
-                    "Student"
-                };
-
-                foreach (var role in roles)
-                {
-                    if (!await roleManager.RoleExistsAsync(role))
-                    {
-                        await roleManager.CreateAsync(
-                            new IdentityRole(role));
-                    }
-                }
+                await IdentitySeeder.SeedAsync(
+                    scope.ServiceProvider);
             }
-
             app.Run();
         }
     }

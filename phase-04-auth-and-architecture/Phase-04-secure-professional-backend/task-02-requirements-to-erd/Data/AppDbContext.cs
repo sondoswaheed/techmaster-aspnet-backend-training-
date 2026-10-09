@@ -15,6 +15,7 @@ namespace task_02_requirements_to_erd.Data
         public DbSet<Enrollment>  Enrollments { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<TrainingTrack> TrainingTracks { get; set; }
+        public DbSet<TrackSession> TrackSessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,6 +25,11 @@ namespace task_02_requirements_to_erd.Data
                         .Property(s => s.StudentId)
                         .ValueGeneratedOnAdd();
 
+            modelBuilder.Entity<TrackSession>()
+                .HasOne(s => s.TrainingTrack)
+                .WithMany(d => d.Sessions)
+                .HasForeignKey(s => s.TrainingTrackId)
+                .IsRequired();
 
             modelBuilder.Entity<Enrollment>()
                 .HasOne(d => d.Student)
