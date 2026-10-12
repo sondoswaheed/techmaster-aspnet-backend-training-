@@ -16,12 +16,14 @@ namespace task_02_requirements_to_erd.Services
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<AuthService> _logger;
 
-        public AuthService(AppDbContext context , IConfiguration configuration , UserManager<ApplicationUser> user)
+        public AuthService(AppDbContext context , IConfiguration configuration , UserManager<ApplicationUser> user, ILogger<AuthService>logger)
         {
             _configuration = configuration;
             _userManager= user;
             _context = context;
+            _logger = logger;
         }
 
         public async Task<CurrentUserResponse> GetCurrentUserAsync(string UserId)
@@ -52,26 +54,49 @@ namespace task_02_requirements_to_erd.Services
 
             if (user == null)
             {
+                _logger.LogWarning("Login failed: account was not found.");
+
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
             if (!user.IsActive)
             {
-                throw new UnauthorizedAccessException(
-                    "Your account is inactive.");
+                _logger.LogWarning( "Login denied for inactive user {UserId}.", user.Id);
+
+                throw new UnauthorizedAccessException( "Your account is inactive.");
             }
 
             var passwordValid = await _userManager.CheckPasswordAsync( user, request.Password);
 
             if (!passwordValid)
             {
+                _logger.LogWarning("Login failed: invalid credentials for user {UserId}.",user.Id);
+
                 throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
             user.LastLoginAt = DateTime.UtcNow;
-            await _userManager.UpdateAsync(user);
+            var updateResult = await _userManager.UpdateAsync(user);
+            ;
 
-            return await CreateAuthResponseAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                _logger.LogError(
+                    "Could not update LastLoginAt for user {UserId}.",
+                    user.Id);
+
+                throw new InvalidOperationException(
+                    "Unable to complete login. Please try again.");
+            }
+
+            var authResponse = await CreateAuthResponseAsync(user);
+
+            _logger.LogInformation(
+                "Login succeeded for user {UserId} with role {Role}.",
+                user.Id,
+                authResponse.Role);
+
+            return authResponse;
         }
 
         public async Task<RegisterResponse> RegisterAsync(RegisterRequest request)
@@ -241,7 +266,7 @@ namespace task_02_requirements_to_erd.Services
                 throw new InvalidOperationException(errors);
             }
 
-            user.UpdatedAt= DateTime.Now;
+            user.UpdatedAt= DateTime.UtcNow;
 
             await _userManager.UpdateAsync(user);
         }

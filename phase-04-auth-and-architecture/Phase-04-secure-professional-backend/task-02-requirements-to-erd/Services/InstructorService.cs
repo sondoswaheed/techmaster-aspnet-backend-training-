@@ -13,17 +13,19 @@ namespace task_02_requirements_to_erd.Services
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public InstructorService(AppDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly ILogger<InstructorService> _logger;
+        public InstructorService(AppDbContext context, UserManager<ApplicationUser> userManager, ILogger<InstructorService> logger)
         {
             _context = context;
             _userManager = userManager;
+            _logger = logger;
         }
         public async Task<InstructorResponse> CreateAsync(CreateInstructorDto dto)
         {
             var EmailExist = await _userManager.FindByEmailAsync(dto.Email);
 
             if (EmailExist != null)
-                throw new Exception("Email already exist");
+                throw new InvalidOperationException("Email already exist");
 
             
 

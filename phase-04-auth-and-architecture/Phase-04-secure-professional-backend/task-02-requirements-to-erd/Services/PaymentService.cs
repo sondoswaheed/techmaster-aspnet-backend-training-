@@ -11,9 +11,11 @@ namespace task_02_requirements_to_erd.Services
     public class PaymentService : IPaymentService
     {
         private readonly AppDbContext _context;
-        public PaymentService(AppDbContext context)
+        private readonly ILogger<PaymentService> _logger;
+        public PaymentService(AppDbContext context , ILogger<PaymentService> logger)
         {
             _context = context;
+            _logger = logger;
         }
         public PaymentResponse Create(CreatePaymentDto dto)
         {
@@ -58,6 +60,8 @@ namespace task_02_requirements_to_erd.Services
             _context.Payments.Add(pay);
             _context.SaveChanges();
 
+            _logger.LogInformation("Payment {PaymentId} created for Enrollment {EnrollmentId}",pay.PaymentId, pay.EnrollmentId);
+
             return MapToResponse(pay);
         }
 
@@ -93,9 +97,17 @@ namespace task_02_requirements_to_erd.Services
             if (pay == null)
                 return null;
 
+            var old = pay.PaymentStatus;
+
             pay.PaymentStatus = dto.PaymentStatus;
 
             _context.SaveChanges();
+
+            _logger.LogInformation("Payment {PaymentId} status changed from {OldStatus} to {NewStatus}",
+                    pay.PaymentId,
+                    old,
+                    pay.PaymentStatus
+            );
 
             return new PaymentResponse { PaymentStatus = pay.PaymentStatus };
         }

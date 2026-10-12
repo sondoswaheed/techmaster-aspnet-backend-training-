@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using task_02_requirements_to_erd.Common.Responses;
 using task_02_requirements_to_erd.Interface;
 
 namespace task_02_requirements_to_erd.Controllers
@@ -22,7 +23,7 @@ namespace task_02_requirements_to_erd.Controllers
         {
             var result = _reportService.GetDashboardSummary();
 
-            return Ok(result);
+            return Ok(ApiResponse<object>.SuccessResponse(result, "dashboard retrieved successfully"));
         }
 
         [HttpGet("unpaid-enrollments")]
@@ -31,7 +32,7 @@ namespace task_02_requirements_to_erd.Controllers
         {
             var result = _reportService.GetUnpaidEnrollments();
 
-            return Ok(result);
+            return Ok(ApiResponse<object>.SuccessResponse(result, "unpaid enrollments retrieved successfully"));
         }
 
         [HttpGet("track-capacity")]
@@ -40,7 +41,7 @@ namespace task_02_requirements_to_erd.Controllers
         {
             var result = _reportService.GetTrackCapacity();
 
-            return Ok(result);
+            return Ok(ApiResponse<object>.SuccessResponse(result, "track capacity retrieved successfully"));
         }
 
         [HttpGet("revenue-summary")]
@@ -49,7 +50,7 @@ namespace task_02_requirements_to_erd.Controllers
         {
             var result = _reportService.GetRevenueSummary();
 
-            return Ok(result);
+            return Ok(ApiResponse<object>.SuccessResponse(result, "revenue summary retrieved successfully"));
         }
 
         [HttpGet("revenue-by-track")]
@@ -58,7 +59,7 @@ namespace task_02_requirements_to_erd.Controllers
         {
             var result = _reportService.GetRevenueByTrack();
 
-            return Ok(result);
+            return Ok(ApiResponse<object>.SuccessResponse(result));
         }
 
         [HttpGet("tracks-with-available-seats")]
@@ -67,7 +68,7 @@ namespace task_02_requirements_to_erd.Controllers
         {
             var result = _reportService.AvailableSeats();
 
-            return Ok(result);
+            return Ok(ApiResponse<object>.SuccessResponse(result));
         }
 
         [HttpGet("top-tracks")]
@@ -76,7 +77,8 @@ namespace task_02_requirements_to_erd.Controllers
         public IActionResult GetTopTracks()
         {
             var result = _reportService.GetTopTracks();
-            return Ok(result);
+
+            return Ok(ApiResponse<object>.SuccessResponse(result, "top tracks retrieved successfully"));
         }
 
         [HttpGet("students-without-payments")]
@@ -84,7 +86,8 @@ namespace task_02_requirements_to_erd.Controllers
         public IActionResult GetStudentsWithoutPayments()
         {
             var result = _reportService.GetStudentsWithoutPayments();
-            return Ok(result);
+                
+            return Ok(ApiResponse<object>.SuccessResponse(result));
         }
     }
 }

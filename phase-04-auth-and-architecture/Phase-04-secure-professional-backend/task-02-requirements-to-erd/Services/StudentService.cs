@@ -13,11 +13,13 @@ namespace task_02_requirements_to_erd.Services
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<StudentService> _logger;
 
-        public StudentService(AppDbContext context, UserManager<ApplicationUser> userManager)
+        public StudentService(AppDbContext context, UserManager<ApplicationUser> userManager ,Logger<StudentService>logger)
         {
             _context = context;
             _userManager = userManager;
+            _logger = logger;
         }
 
         public List<StudentResponse> GetAll(int pageSize=10,int pageNumber=1,bool? IsActive=null,string? search=null)
@@ -74,6 +76,8 @@ namespace task_02_requirements_to_erd.Services
             _context.Students.Add(student);
             _context.SaveChanges();
 
+            _logger.LogInformation("Student {StudentId} updated by an administrative operation", student.StudentId);
+
             return MapToResponse(student);
         }
 
@@ -99,6 +103,8 @@ namespace task_02_requirements_to_erd.Services
 
             _context.SaveChanges();
 
+            _logger.LogInformation("Student {StudentId} updated by an administrative operation",student.StudentId);
+
             return MapToResponse(student);
         }
 
@@ -114,6 +120,8 @@ namespace task_02_requirements_to_erd.Services
             student.DeletedAt=DateTime.UtcNow;
 
             _context.SaveChanges();
+
+            _logger.LogInformation("Student {StudentId} soft-deleted", student.StudentId);
 
             return true;
             

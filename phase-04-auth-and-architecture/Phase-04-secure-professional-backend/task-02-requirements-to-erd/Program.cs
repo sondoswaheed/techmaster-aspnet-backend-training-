@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using task_02_requirements_to_erd.Common.Responses;
 using task_02_requirements_to_erd.Data;
 using task_02_requirements_to_erd.Interface;
+using task_02_requirements_to_erd.Middleware;
 using task_02_requirements_to_erd.Models;
 using task_02_requirements_to_erd.Services;
 
@@ -58,36 +61,64 @@ namespace task_02_requirements_to_erd
                     "JWT Key is missing from configuration.");
             }
 
-            builder.Services
-                .AddAuthentication(options =>
+            builder.Services.AddAuthentication(options =>
                 {
-                    options.DefaultAuthenticateScheme =
-                        JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 
-                    options.DefaultChallengeScheme =
-                        JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 })
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters =
-                        new TokenValidationParameters
-                        {
-                            ValidateIssuer = true,
-                            ValidateAudience = true,
-                            ValidateLifetime = true,
-                            ValidateIssuerSigningKey = true,
 
-                            ValidIssuer =
-                                builder.Configuration["Jwt:Issuer"],
+            .AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
 
-                            ValidAudience =
-                                builder.Configuration["Jwt:Audience"],
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(jwtKey))
+    };
 
-                            IssuerSigningKey =
-                                new SymmetricSecurityKey(
-                                    Encoding.UTF8.GetBytes(jwtKey))
-                        };
-                });
+    options.Events = new JwtBearerEvents
+    {
+        // Missing, invalid, or expired token
+        OnChallenge = async context =>
+        {
+            context.HandleResponse();
+
+            context.Response.StatusCode =
+                StatusCodes.Status401Unauthorized;
+
+            context.Response.ContentType = "application/json";
+
+            var response = ApiResponse<object>.ErrorResponse(
+                "Authentication is required or the access token is invalid."
+            );
+
+            await context.Response.WriteAsJsonAsync(response);
+        },
+
+        // Authenticated user does not have permission
+        OnForbidden = async context =>
+        {
+            context.Response.StatusCode =
+                StatusCodes.Status403Forbidden;
+
+            context.Response.ContentType = "application/json";
+
+            var response = ApiResponse<object>.ErrorResponse(
+                "You do not have permission to perform this action."
+            );
+
+            await context.Response.WriteAsJsonAsync(response);
+        }
+    };
+});
+
 
             builder.Services.AddAuthorization();
 
@@ -98,8 +129,7 @@ namespace task_02_requirements_to_erd
             {
                 c.UseInlineDefinitionsForEnums();
 
-                c.AddSecurityDefinition(
-                    "Bearer",
+                c.AddSecurityDefinition("Bearer",
                     new OpenApiSecurityScheme
                     {
                         Name = "Authorization",
@@ -117,17 +147,34 @@ namespace task_02_requirements_to_erd
                         {
                             new OpenApiSecurityScheme
                             {
-                                Reference =
-                                    new OpenApiReference
+                                Reference = new OpenApiReference
                                     {
-                                        Type =
-                                            ReferenceType.SecurityScheme,
+                                        Type = ReferenceType.SecurityScheme,
                                         Id = "Bearer"
                                     }
                             },
                             Array.Empty<string>()
                         }
                     });
+            });
+
+
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var errors = context.ModelState
+                        .Where(x => x.Value?.Errors.Count > 0)
+                        .SelectMany(x => x.Value!.Errors)
+                        .Select(x => string.IsNullOrWhiteSpace(x.ErrorMessage)
+                            ? "Invalid request value.": x.ErrorMessage)
+                        .ToList();
+
+                    var response = ApiResponse<object>.ErrorResponse( "Validation failed.", errors
+                    );
+
+                    return new BadRequestObjectResult(response);
+                };
             });
 
             // Existing services
@@ -148,7 +195,7 @@ namespace task_02_requirements_to_erd
             app.UseSwaggerUI();
 
             app.UseHttpsRedirection();
-
+            app.UseMiddleware<GlobalExceptionMiddleware>();
             // IMPORTANT ORDER
             app.UseAuthentication();
             app.UseAuthorization();

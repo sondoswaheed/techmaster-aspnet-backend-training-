@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using task_02_requirements_to_erd.Common.Responses;
 using task_02_requirements_to_erd.DTOs;
 using task_02_requirements_to_erd.Interface;
 using task_02_requirements_to_erd.Models.Enums;
@@ -22,7 +23,7 @@ public class TracksController : ControllerBase
     {
         var result = _trainingService.GetAll( keyword,level, status, instructorId);
 
-        return Ok(result);
+        return Ok(ApiResponse<object>.SuccessResponse(result, "Tracks retrieved successfully"));
     }
 
     [HttpGet("{id}")]
@@ -37,7 +38,7 @@ public class TracksController : ControllerBase
                 message = "Training track not found."
             });
 
-        return Ok(result);
+        return Ok(ApiResponse<object>.SuccessResponse(result, "Track details retreived successfully"));
     }
 
     [HttpPost]
@@ -48,14 +49,11 @@ public class TracksController : ControllerBase
         {
             var result = _trainingService.Create(dto);
 
-            return StatusCode(201, result);
+            return StatusCode(201, ApiResponse<TrainingTrackResponse>.SuccessResponse(result, "Tracks created successfully"));
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new
-            {
-                message = ex.Message
-            });
+            return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
         }
     }
 
@@ -73,14 +71,11 @@ public class TracksController : ControllerBase
                     message = "Training track not found."
                 });
 
-            return Ok(result);
+            return Ok(ApiResponse<TrainingTrackResponse>.SuccessResponse(result, "Tracks updated successfully"));
         }
         catch (InvalidOperationException ex)
         {
-            return BadRequest(new
-            {
-                message = ex.Message
-            });
+            return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
         }
     }
 
@@ -98,17 +93,11 @@ public class TracksController : ControllerBase
                     message = "Training track not found."
                 });
 
-            return Ok(new
-            {
-                message = "Training track deleted successfully."
-            });
+            return Ok(ApiResponse<object>.SuccessResponse(result, "Tracks deleted successfully"));
         }
         catch (InvalidOperationException ex)
         {
-            return Conflict(new
-            {
-                message = ex.Message
-            });
+            return Conflict(ApiResponse<object>.ErrorResponse(ex.Message));
         }
     }
 }

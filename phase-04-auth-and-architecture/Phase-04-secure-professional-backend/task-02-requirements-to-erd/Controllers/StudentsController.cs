@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using task_02_requirements_to_erd.Common.Responses;
 using task_02_requirements_to_erd.DTOs;
 using task_02_requirements_to_erd.Interface;
 using task_02_requirements_to_erd.Models;
@@ -27,7 +29,7 @@ namespace task_02_requirements_to_erd.Controllers
         {
             var result = _studentService.GetAll( pageSize,pageNumber, IsActive, search);
 
-            return Ok(result);
+            return Ok(ApiResponse<List<StudentResponse>>.SuccessResponse(result, "students retrieved successfully"));
         }
 
         [HttpGet("{id}")]
@@ -37,9 +39,9 @@ namespace task_02_requirements_to_erd.Controllers
             var result =_studentService.GetById(id);
 
             if (result == null)
-                return NotFound(new { message = "student not found" });
+                return NotFound(ApiResponse<object>.ErrorResponse( "student not found" ));
 
-            return Ok(result);
+            return Ok(ApiResponse<StudentResponse>.SuccessResponse(result, "student retrieved successfully"));
         }
 
         //[HttpPost]
@@ -66,12 +68,12 @@ namespace task_02_requirements_to_erd.Controllers
                 var result = _studentService.Update(id, dto);
 
                 if (result == null)
-                    return NotFound(new { message = "student not found" });
+                    return NotFound(ApiResponse<object>.ErrorResponse("student not found" ));
 
-                return Ok(result);
+                return Ok(ApiResponse<StudentResponse>.SuccessResponse(result, "student updated successfully"));
             }catch(InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }
 
@@ -103,10 +105,10 @@ namespace task_02_requirements_to_erd.Controllers
                 if (student == null)
                     return NotFound("Student not found ");
 
-                return Ok(student);
+                return Ok(ApiResponse<StudentResponse>.SuccessResponse(student, "students retrieved successfully"));
             }catch(UnauthorizedAccessException ex)
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }
 
@@ -124,12 +126,12 @@ namespace task_02_requirements_to_erd.Controllers
                 if (student == null)
                     return NotFound("Student not found ");
 
-                return Ok(student);
+                return Ok(ApiResponse<object>.SuccessResponse(student, "enrollments retrieved successfully"));
 
             }
             catch(UnauthorizedAccessException ex)
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }
 
@@ -145,12 +147,12 @@ namespace task_02_requirements_to_erd.Controllers
                 if (string.IsNullOrEmpty(userId))
                     return Unauthorized();
 
-                var result = await _studentService
-                    .GetMyPayments(userId);
+                var result = await _studentService.GetMyPayments(userId);
 
-                return Ok(result);
+                return Ok(ApiResponse<object>.SuccessResponse(result, "payments retrieved successfully"));
+
             }catch(UnauthorizedAccessException ex)
-            { return Unauthorized(ex.Message); }
+            { return Unauthorized(ApiResponse<object>.ErrorResponse(ex.Message)); }
         }
 
 
@@ -167,15 +169,15 @@ namespace task_02_requirements_to_erd.Controllers
                 var result = await _studentService
                     .UpdateMyProfileAsync(userId, request);
 
-                return Ok(result);
+                return Ok(ApiResponse<StudentResponse>.SuccessResponse(result, "profile updated successfully"));
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Unauthorized(new { message = ex.Message });
+                return Unauthorized(ApiResponse<object>.ErrorResponse(ex.Message));
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }
 

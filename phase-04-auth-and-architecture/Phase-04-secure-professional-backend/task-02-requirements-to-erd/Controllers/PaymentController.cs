@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using task_02_requirements_to_erd.Common.Responses;
 using task_02_requirements_to_erd.DTOs;
 using task_02_requirements_to_erd.Interface;
 using task_02_requirements_to_erd.Models.Enums;
@@ -23,7 +24,7 @@ namespace task_02_requirements_to_erd.Controllers
         public IActionResult Get(DateOnly? FromDate, DateOnly? ToDate, PaymentStatus? status)
         {
             var pay = _paymentService.GetAll(FromDate, ToDate,status);
-            return Ok(pay);
+            return Ok(ApiResponse<List<PaymentResponse>>.SuccessResponse(pay));
         }
 
         [HttpPost]
@@ -34,11 +35,11 @@ namespace task_02_requirements_to_erd.Controllers
             {
                 var pay = _paymentService.Create(dto);
 
-                return StatusCode(201, pay);
+                return StatusCode(201,ApiResponse<PaymentResponse>.SuccessResponse(pay, "Payments Created successfully"));
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ApiResponse<PaymentResponse>.ErrorResponse(ex.Message));
             }
         }
 
@@ -49,9 +50,9 @@ namespace task_02_requirements_to_erd.Controllers
             var pay= _paymentService.Update(id, dto);
 
             if (pay == null)
-                return NotFound("Payment not found");
+                return NotFound(ApiResponse<PaymentResponse>.ErrorResponse( "Payment not found"));
 
-            return Ok(pay);
+            return Ok(ApiResponse<PaymentResponse>.SuccessResponse(pay,"Payments updated successfully"));
         }
 
         [HttpGet("/api/enrollments/{id}/payments")]
@@ -62,11 +63,11 @@ namespace task_02_requirements_to_erd.Controllers
             {
                 var payments = _paymentService.GetByEnrollmentId(id);
 
-                return Ok(payments);
+                return Ok(ApiResponse<List<PaymentResponse>>.SuccessResponse(payments,"payments returns successfully"));
             }
             catch (InvalidOperationException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ApiResponse<List<PaymentResponse>>.ErrorResponse(ex.Message));
             }
         }
     }

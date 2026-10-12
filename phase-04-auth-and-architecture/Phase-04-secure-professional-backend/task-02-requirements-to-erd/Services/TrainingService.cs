@@ -11,9 +11,11 @@ namespace task_02_requirements_to_erd.Services
     public class TrainingService : ITrainingService
     {
         private readonly AppDbContext _context;
-        public TrainingService(AppDbContext context)
+        private readonly ILogger<TrainingService> _logger;
+        public TrainingService(AppDbContext context, ILogger<TrainingService> logger)
         {
-            _context = context;
+            _context = context;     
+            _logger = logger;
         }
         public TrainingTrackResponse Create(CreateTrackDto dto)
         {
@@ -51,6 +53,8 @@ namespace task_02_requirements_to_erd.Services
             _context.TrainingTracks.Add(track);
             _context.SaveChanges();
 
+            _logger.LogInformation("Track with {trackId} Created by admin", track.TrainingTrackId);
+
             return MapToResponse(track);
         }
 
@@ -71,7 +75,7 @@ namespace task_02_requirements_to_erd.Services
             track.IsDeleted= true;
 
             _context.SaveChanges();
-
+            _logger.LogInformation("Training track {TrackId} soft-deleted",track.TrainingTrackId);
             return true;
         }
 
@@ -147,6 +151,7 @@ namespace task_02_requirements_to_erd.Services
 
             _context.SaveChanges();
 
+            _logger.LogInformation( "Training track {TrackId} updated",track.TrainingTrackId);
             return MapToResponse(track);
 
         }

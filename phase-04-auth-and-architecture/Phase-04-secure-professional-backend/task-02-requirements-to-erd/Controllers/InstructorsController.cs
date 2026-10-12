@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using task_02_requirements_to_erd.Common.Responses;
 using task_02_requirements_to_erd.DTOs;
 using task_02_requirements_to_erd.Interface;
 
@@ -24,7 +25,10 @@ namespace task_02_requirements_to_erd.Controllers
         {
             var result = _instructorService.GetAll();
 
-            return Ok(result);
+            return Ok(ApiResponse<List<InstructorResponse>>.SuccessResponse(
+            result,
+            "Instructors retrieved successfully."
+        ));
         }
 
         [HttpGet("{id}")]
@@ -32,38 +36,67 @@ namespace task_02_requirements_to_erd.Controllers
         public IActionResult Details(int id)
         {
             var result = _instructorService.Details(id);
-
             if (result == null)
-                return BadRequest();
+            {
+                return NotFound(
+                    ApiResponse<object>.ErrorResponse("Instructor not found.")
+                );
+            }
 
-            return Ok(result);
+            return Ok( ApiResponse<InstructorResponse>.SuccessResponse( result, "Instructor retrieved successfully."));
         }
 
-        [HttpPut]
+        [HttpPut("{id:int}")]
         [Authorize(Roles = "Admin")]
-        public IActionResult Update(int id, UpdateInstructorDto dto)
+        public IActionResult Update(int id, [FromBody] UpdateInstructorDto dto)
         {
-            var result = _instructorService.Update(id, dto);
+            try
+            {
+                var result = _instructorService.Update(id, dto);
 
-            if (result == null)
-                return BadRequest();
+                if (result == null)
+                {
+                    return NotFound(
+                        ApiResponse<object>.ErrorResponse("Instructor not found.")
+                    );
+                }
 
-            return Ok(result);
+                return Ok(
+                    ApiResponse<InstructorResponse>.SuccessResponse(
+                        result,
+                        "Instructor updated successfully."
+                    )
+                );
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(
+                    ApiResponse<object>.ErrorResponse(ex.Message)
+                );
+            }
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create(CreateInstructorDto dto)
+        public async Task<IActionResult> Create([FromBody] CreateInstructorDto dto)
         {
             try
             {
                 var result = await _instructorService.CreateAsync(dto);
 
-                return StatusCode(201, result);
+
+                return StatusCode(
+                    201,
+                    ApiResponse<InstructorResponse>.SuccessResponse(
+                        result, "Instructor created successfully."
+                    )
+                );
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(
+                    ApiResponse<object>.ErrorResponse(ex.Message)
+                );
             }
         }
 
@@ -74,36 +107,47 @@ namespace task_02_requirements_to_erd.Controllers
             var result = _instructorService.GetInstructorWithTracks(id);
 
             if (result == null)
-                return BadRequest();
+                return NotFound( ApiResponse<object>.ErrorResponse("Instructor not found."));
 
-            return Ok(result);
+            return Ok(ApiResponse<InstructorTracksDto>.SuccessResponse(
+            result,
+            "Instructor tracks retrieved successfully."
+        ));
         }
 
         [HttpPut("me")]
         [Authorize(Roles = "Instructor")]
-        public async Task<IActionResult> UpdateMyProfile(
-    UpdateMyInstructorProfileDto dto)
+        public async Task<IActionResult> UpdateMyProfile([FromBody] UpdateMyInstructorProfileDto dto)
         {
-            var userId = User.FindFirstValue(
-                ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
+            {
+                return Unauthorized(
+                    ApiResponse<object>.ErrorResponse("Authentication required.")
+                );
+            }
 
             try
             {
-                var result = await _instructorService
-                    .UpdateMyProfileAsync(userId, dto);
+                var result = await _instructorService.UpdateMyProfileAsync(userId, dto);
 
-                return Ok(result);
+                return Ok(
+                    ApiResponse<InstructorResponse>.SuccessResponse(
+                        result,
+                        "Profile updated successfully."
+                    )
+                );
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
                 return Forbid();
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(
+                    ApiResponse<object>.ErrorResponse(ex.Message)
+                );
             }
         }
 
@@ -117,10 +161,9 @@ namespace task_02_requirements_to_erd.Controllers
             if (CurrentUserId == null)
                 return Unauthorized();
 
-            var result = await _instructorService
-                .GetMyTracksAsync(CurrentUserId);
+            var result = await _instructorService.GetMyTracksAsync(CurrentUserId);
 
-            return Ok(result);
+            return Ok(ApiResponse<object>.SuccessResponse(result,"Tracks retreived successfully"));
         }
 
         [HttpGet("tracks/{id:int}/students")]
@@ -134,7 +177,7 @@ namespace task_02_requirements_to_erd.Controllers
             {
                 var result = await _instructorService.GetTrackStudentsAsync(CurrentUserId, id);
 
-                return Ok(result);
+                return Ok(ApiResponse<object>.SuccessResponse(result, "Students retrieved successfully"));
             }
             catch (UnauthorizedAccessException)
             {
@@ -155,10 +198,9 @@ namespace task_02_requirements_to_erd.Controllers
 
             try
             {
-                var result = await _instructorService
-                    .CreateSessionAsync(CurrentUserId, id, dto);
+                var result = await _instructorService.CreateSessionAsync(CurrentUserId, id, dto);
 
-                return StatusCode(201, result);
+                return StatusCode(201, ApiResponse<object>.SuccessResponse(result, "Session Created successfully"));
             }
             catch (UnauthorizedAccessException)
             {
@@ -166,7 +208,7 @@ namespace task_02_requirements_to_erd.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }
 
@@ -181,7 +223,7 @@ namespace task_02_requirements_to_erd.Controllers
             {
                 var result = await _instructorService.UpdateSessionAsync(CurrentUserId, id, dto);
 
-                return Ok(result);
+                return Ok(ApiResponse<object>.SuccessResponse(result, "Session Updated successfully"));
             }
             catch (UnauthorizedAccessException)
             {
@@ -189,7 +231,7 @@ namespace task_02_requirements_to_erd.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }
 
@@ -203,10 +245,9 @@ namespace task_02_requirements_to_erd.Controllers
 
             try
             {
-                var result = await _instructorService
-                    .GetTrackProgressAsync(CurrentUserId, id);
+                var result = await _instructorService.GetTrackProgressAsync(CurrentUserId, id);
 
-                return Ok(result);
+                return Ok(ApiResponse<object>.SuccessResponse(result));
             }
             catch (UnauthorizedAccessException)
             {
@@ -214,7 +255,7 @@ namespace task_02_requirements_to_erd.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
             }
 
         }

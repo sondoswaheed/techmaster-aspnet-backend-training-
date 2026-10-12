@@ -12,10 +12,12 @@ namespace task_02_requirements_to_erd.Services
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public EnrollmentService(AppDbContext context , UserManager<ApplicationUser> userManager)
+        private readonly ILogger<EnrollmentService> _logger;
+        public EnrollmentService(AppDbContext context , UserManager<ApplicationUser> userManager, ILogger<EnrollmentService> logger)
         {
             _context = context;
             _userManager = userManager;
+            _logger = logger;
         }
         public EnrollmentResponseDto Create(CreateEnrollmentDto dto)
         {
@@ -47,8 +49,7 @@ namespace task_02_requirements_to_erd.Services
 
             if (track.Status == TrainingStatus.Finished || track.Status == TrainingStatus.Cancelled)
             {
-                throw new InvalidOperationException(
-                    "Cannot enroll in a closed track.");
+                throw new InvalidOperationException( "Cannot enroll in a closed track.");
             }
 
             if (enrolledCount >= track.Capacity)
@@ -69,6 +70,8 @@ namespace task_02_requirements_to_erd.Services
              
             _context.Enrollments.Add(student);
             _context.SaveChanges();
+
+            _logger.LogInformation("Enrollment {EnrollmentId} Created by Admin",student.EnrollmentId);
 
             return MApToResponse(student);
         }
@@ -151,7 +154,7 @@ namespace task_02_requirements_to_erd.Services
             if (enroll == null)
                 return null;
 
-
+            var oldStatus=enroll.Status;
 
             if (!IsValidTransition(enroll.Status, status))
             {
@@ -173,6 +176,8 @@ namespace task_02_requirements_to_erd.Services
             enroll.UpdatedAt = DateTime.UtcNow;
 
             _context.SaveChanges();
+
+            _logger.LogInformation("Status of {Enrollmentid} Updated from {oldStatus}  to {newStatus} ",enroll.EnrollmentId,oldStatus, enroll.Status);
 
             return new EnrollmentResponseDto { Status=status };
         }
@@ -268,6 +273,11 @@ namespace task_02_requirements_to_erd.Services
             _context.Enrollments.Add(enrollment);
 
             await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Enrollment {EnrollmentId} requested by Student {StudentId} for Track {TrackId}",
+                    enrollment.EnrollmentId,
+                    enrollment.StudentId,
+                    enrollment.TrainingTrackId);
 
             return enrollment;
         }

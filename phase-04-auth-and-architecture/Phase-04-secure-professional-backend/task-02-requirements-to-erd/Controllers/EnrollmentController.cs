@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using task_02_requirements_to_erd.Common.Responses;
 using task_02_requirements_to_erd.DTOs;
 using task_02_requirements_to_erd.Interface;
+using task_02_requirements_to_erd.Models;
 using task_02_requirements_to_erd.Models.Enums;
 
 namespace task_02_requirements_to_erd.Controllers
@@ -25,7 +27,7 @@ namespace task_02_requirements_to_erd.Controllers
         {
             var enrollments = _enrollmentService.GetAll( status,trackId, studentId, paymentStatus);
 
-            return Ok(enrollments);
+            return Ok(ApiResponse<List<EnrollmentResponseDto>>.SuccessResponse(enrollments, "enrollments retrieved successfully")));
         }
 
         [HttpGet("{id}")]
@@ -39,7 +41,7 @@ namespace task_02_requirements_to_erd.Controllers
                 return NotFound("Enrollment doesn't exist");
             }
 
-            return Ok(enrollment);
+            return Ok(ApiResponse<EnrollmentResponseDto>.SuccessResponse(enrollment, "enrollment retrieved successfully"));
         }
 
         [HttpPost]
@@ -50,11 +52,11 @@ namespace task_02_requirements_to_erd.Controllers
             {
                 var enrollment = _enrollmentService.Create(dto);
 
-                return StatusCode(201, enrollment);
+                return StatusCode(201, ApiResponse<object>.SuccessResponse(enrollment, "Enrollment Created successfully"));
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }
 
@@ -68,14 +70,14 @@ namespace task_02_requirements_to_erd.Controllers
 
                 if (enrollment == null)
                 {
-                    return NotFound("Enrollment doesn't exist");
+                    return NotFound(ApiResponse<object>.ErrorResponse("Enrollment doesn't exist"));
                 }
 
-                return Ok(enrollment);
+                return Ok(ApiResponse<object>.SuccessResponse(enrollment, "status updated successfully"));
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }
 
@@ -87,11 +89,11 @@ namespace task_02_requirements_to_erd.Controllers
             {
                 var enrollments = _enrollmentService.GetStudentById(id);
 
-                return Ok(enrollments);
+                return Ok(ApiResponse<object>.SuccessResponse(enrollments, "enrollments retrieved successfully"));
             }
             catch (InvalidOperationException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }
 
@@ -103,11 +105,11 @@ namespace task_02_requirements_to_erd.Controllers
             {
                 var students = _enrollmentService.GetTracksById(id);
 
-                return Ok(students);
+                return Ok(ApiResponse<List<StudentResponse>>.SuccessResponse(students, "Tracks retreived successfully"));
             }
             catch (InvalidOperationException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }
 
@@ -124,19 +126,19 @@ namespace task_02_requirements_to_erd.Controllers
             {
                 var result = await _enrollmentService .RequestEnrollmentAsync(userId, request.TrainingTrackId);
 
-                return StatusCode( 201, result);
+                return StatusCode( 201, ApiResponse<object>.SuccessResponse(result, "enrollment requested successfully"));
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Unauthorized(new { message = ex.Message });
+                return Unauthorized(ApiResponse<object>.ErrorResponse(ex.Message));
             }
             catch (KeyNotFoundException ex)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
             }
             catch (InvalidOperationException ex)
             {
-                return Conflict(new { message = ex.Message });
+                return Conflict(ApiResponse<object>.ErrorResponse(ex.Message));
             }
         }
     }
