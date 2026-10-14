@@ -1,0 +1,6 @@
+@task_08_bad_auth_refactor_HostAddress = http://localhost:5168
+
+GET {{task_08_bad_auth_refactor_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
