@@ -17,13 +17,16 @@ namespace task_02_requirements_to_erd.Services
         private readonly IConfiguration _configuration;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<AuthService> _logger;
+        private readonly ActivityLogService _activityLogService;
 
-        public AuthService(AppDbContext context , IConfiguration configuration , UserManager<ApplicationUser> user, ILogger<AuthService>logger)
+        public AuthService(AppDbContext context , IConfiguration configuration , UserManager<ApplicationUser> user, ILogger<AuthService>logger
+            ,ActivityLogService activityLogService)
         {
             _configuration = configuration;
             _userManager= user;
             _context = context;
             _logger = logger;
+            _activityLogService = activityLogService;
         }
 
         public async Task<CurrentUserResponse> GetCurrentUserAsync(string UserId)
@@ -77,7 +80,7 @@ namespace task_02_requirements_to_erd.Services
 
             user.LastLoginAt = DateTime.UtcNow;
             var updateResult = await _userManager.UpdateAsync(user);
-            ;
+            
 
             if (!updateResult.Succeeded)
             {
@@ -96,6 +99,15 @@ namespace task_02_requirements_to_erd.Services
                 user.Id,
                 authResponse.Role);
 
+
+            await _activityLogService.LogAsync(
+                action: "LoggedIn",
+                entityName: "User",
+                entityId: user.Id,
+                description: "User logged in successfully.",
+                actorUserId: user.Id,
+                actorRole: (await _userManager.GetRolesAsync(user))
+        .FirstOrDefault() ?? user.Role);
             return authResponse;
         }
 
@@ -103,8 +115,7 @@ namespace task_02_requirements_to_erd.Services
         {
             if (!string.Equals( request.Role,"Student", StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidOperationException(
-                    "Register is allowed for Student only.");
+                throw new InvalidOperationException( "Register is allowed for Student only.");
             }
 
 
@@ -112,10 +123,9 @@ namespace task_02_requirements_to_erd.Services
 
             if (emailExist != null)
             {
-                throw new InvalidOperationException(
-                    "Email is already exist.");
+                throw new InvalidOperationException( "Email is already exist.");
             }
-
+         
 
             // Create Student
             var student = new Student
@@ -136,8 +146,7 @@ namespace task_02_requirements_to_erd.Services
 
             if (student.StudentId <= 0)
             {
-                throw new InvalidOperationException(
-                    "StudentId was not generated.");
+                throw new InvalidOperationException( "StudentId was not generated.");
             }
 
             var user = new ApplicationUser
@@ -179,7 +188,13 @@ namespace task_02_requirements_to_erd.Services
 
                 throw new InvalidOperationException(errors);
             }
-
+            await _activityLogService.LogAsync(
+                    action: "Registered",
+                    entityName: "User",
+                    entityId: user.Id,
+                    description: "A new student registered.",
+                    actorUserId: user.Id,
+                    actorRole: "Student");
 
             // Generate JWT
             return new RegisterResponse

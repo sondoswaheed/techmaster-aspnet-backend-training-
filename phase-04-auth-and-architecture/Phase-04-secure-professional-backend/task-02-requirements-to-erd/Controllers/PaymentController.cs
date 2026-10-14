@@ -29,11 +29,11 @@ namespace task_02_requirements_to_erd.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public IActionResult Create([FromForm]CreatePaymentDto dto)
+        public async Task<IActionResult> Create([FromForm]CreatePaymentDto dto)
         {
             try
             {
-                var pay = _paymentService.Create(dto);
+                var pay =await _paymentService.Create(dto);
 
                 return StatusCode(201,ApiResponse<PaymentResponse>.SuccessResponse(pay, "Payments Created successfully"));
             }
@@ -45,9 +45,9 @@ namespace task_02_requirements_to_erd.Controllers
 
         [HttpPut("{id}/Status")]
         [Authorize(Roles = "Admin")]
-        public IActionResult Update(int id,UpdatePaymentDto dto)
+        public async Task<IActionResult> Update(int id,UpdatePaymentDto dto)
         {
-            var pay= _paymentService.Update(id, dto);
+            var pay= await _paymentService.Update(id, dto);
 
             if (pay == null)
                 return NotFound(ApiResponse<PaymentResponse>.ErrorResponse( "Payment not found"));

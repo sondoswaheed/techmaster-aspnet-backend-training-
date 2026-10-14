@@ -27,7 +27,7 @@ namespace task_02_requirements_to_erd.Controllers
         {
             var enrollments = _enrollmentService.GetAll( status,trackId, studentId, paymentStatus);
 
-            return Ok(ApiResponse<List<EnrollmentResponseDto>>.SuccessResponse(enrollments, "enrollments retrieved successfully")));
+            return Ok(ApiResponse<List<EnrollmentResponseDto>>.SuccessResponse(enrollments, "enrollments retrieved successfully"));
         }
 
         [HttpGet("{id}")]

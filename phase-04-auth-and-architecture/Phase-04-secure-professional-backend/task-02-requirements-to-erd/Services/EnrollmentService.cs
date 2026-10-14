@@ -13,11 +13,13 @@ namespace task_02_requirements_to_erd.Services
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<EnrollmentService> _logger;
-        public EnrollmentService(AppDbContext context , UserManager<ApplicationUser> userManager, ILogger<EnrollmentService> logger)
+        private readonly ActivityLogService _activityLogService;
+        public EnrollmentService(AppDbContext context , UserManager<ApplicationUser> userManager, ILogger<EnrollmentService> logger ,ActivityLogService activityLogService)
         {
             _context = context;
             _userManager = userManager;
             _logger = logger;
+            _activityLogService = activityLogService;
         }
         public EnrollmentResponseDto Create(CreateEnrollmentDto dto)
         {
@@ -147,9 +149,9 @@ namespace task_02_requirements_to_erd.Services
             }).ToList();
         }
 
-        public EnrollmentResponseDto UpdateStatus(int id,EnrollmentStatus status)
+        public async Task<EnrollmentResponseDto> UpdateStatus(int id,EnrollmentStatus status)
         {
-            var enroll=_context.Enrollments.FirstOrDefault(s=>s.EnrollmentId==id);
+            var enroll=await _context.Enrollments.FirstOrDefaultAsync(s=>s.EnrollmentId==id);
 
             if (enroll == null)
                 return null;
@@ -175,9 +177,21 @@ namespace task_02_requirements_to_erd.Services
             enroll.Status = status;
             enroll.UpdatedAt = DateTime.UtcNow;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Status of {Enrollmentid} Updated from {oldStatus}  to {newStatus} ",enroll.EnrollmentId,oldStatus, enroll.Status);
+            await _activityLogService.LogAsync(
+                action:"Update status",
+                entityName:"Enrollment",
+                entityId:enroll.EnrollmentId.ToString(),
+                description:$"enrollment {enroll.EnrollmentId} status updated ",
+                metadata: new
+                {
+                    OldStatus = oldStatus,
+                    newStatus=enroll.Status
+                }
+                );
+
+            _logger.LogInformation("Status of {EnrollmentId} Updated from {oldStatus}  to {newStatus} ",enroll.EnrollmentId,oldStatus, enroll.Status);
 
             return new EnrollmentResponseDto { Status=status };
         }
@@ -273,6 +287,17 @@ namespace task_02_requirements_to_erd.Services
             _context.Enrollments.Add(enrollment);
 
             await _context.SaveChangesAsync();
+
+            await _activityLogService.LogAsync(
+                action: "Requested",
+                entityName: "Enrollment",
+                entityId: enrollment.EnrollmentId.ToString(),
+                description: $"Enrollment {enrollment.EnrollmentId} requested by Student {enrollment.StudentId} for Track {enrollment.TrainingTrackId}",
+                metadata: new
+                {
+                    newStatus = enrollment.Status.ToString()
+                }
+                );
 
             _logger.LogInformation("Enrollment {EnrollmentId} requested by Student {StudentId} for Track {TrackId}",
                     enrollment.EnrollmentId,

@@ -12,17 +12,19 @@ namespace task_02_requirements_to_erd.Services
     {
         private readonly AppDbContext _context;
         private readonly ILogger<TrainingService> _logger;
-        public TrainingService(AppDbContext context, ILogger<TrainingService> logger)
+        private readonly ActivityLogService _activityLogService;
+        public TrainingService(AppDbContext context, ILogger<TrainingService> logger , ActivityLogService activityLogService)
         {
             _context = context;     
             _logger = logger;
+            _activityLogService = activityLogService;
         }
-        public TrainingTrackResponse Create(CreateTrackDto dto)
+        public async Task<TrainingTrackResponse> Create(CreateTrackDto dto)
         {
             if (string.IsNullOrWhiteSpace(dto.Title))
                 throw new InvalidOperationException("Title is required.");
 
-            var instructorExists = _context.Instructors.Any(i => i.InstructorId == dto.InstructorId);
+            var instructorExists =await _context.Instructors.AnyAsync(i => i.InstructorId == dto.InstructorId);
 
             if (!instructorExists)
                 throw new InvalidOperationException("Instructor not found.");
@@ -51,7 +53,14 @@ namespace task_02_requirements_to_erd.Services
             };
 
             _context.TrainingTracks.Add(track);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
+            await _activityLogService.LogAsync(
+                action:"Created",
+                entityName:"TrainingTrack",
+                entityId:track.TrainingTrackId.ToString(),
+                description:$"Training track {track.TrainingTrackId} was Created"
+                );
 
             _logger.LogInformation("Track with {trackId} Created by admin", track.TrainingTrackId);
 

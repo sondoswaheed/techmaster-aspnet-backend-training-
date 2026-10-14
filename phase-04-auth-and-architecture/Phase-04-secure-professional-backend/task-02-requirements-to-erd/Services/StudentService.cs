@@ -15,7 +15,7 @@ namespace task_02_requirements_to_erd.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ILogger<StudentService> _logger;
 
-        public StudentService(AppDbContext context, UserManager<ApplicationUser> userManager ,Logger<StudentService>logger)
+        public StudentService(AppDbContext context, UserManager<ApplicationUser> userManager ,ILogger<StudentService>logger)
         {
             _context = context;
             _userManager = userManager;

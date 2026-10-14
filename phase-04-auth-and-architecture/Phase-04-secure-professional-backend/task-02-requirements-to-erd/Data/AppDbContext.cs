@@ -17,6 +17,8 @@ namespace task_02_requirements_to_erd.Data
         public DbSet<TrainingTrack> TrainingTracks { get; set; }
         public DbSet<TrackSession> TrackSessions { get; set; }
 
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

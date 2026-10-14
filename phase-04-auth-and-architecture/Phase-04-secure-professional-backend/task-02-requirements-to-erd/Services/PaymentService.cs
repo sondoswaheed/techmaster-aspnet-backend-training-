@@ -12,16 +12,18 @@ namespace task_02_requirements_to_erd.Services
     {
         private readonly AppDbContext _context;
         private readonly ILogger<PaymentService> _logger;
-        public PaymentService(AppDbContext context , ILogger<PaymentService> logger)
+        private readonly ActivityLogService _activityLogService; 
+        public PaymentService(AppDbContext context , ILogger<PaymentService> logger , ActivityLogService activityLogService)
         {
             _context = context;
             _logger = logger;
+            _activityLogService = activityLogService;
         }
-        public PaymentResponse Create(CreatePaymentDto dto)
+        public async Task<PaymentResponse> Create(CreatePaymentDto dto)
         {
-            var enrollment = _context.Enrollments
+            var enrollment =await _context.Enrollments
                 .Include(e => e.Payments)
-                .FirstOrDefault(e => e.EnrollmentId == dto.EnrollmentId);
+                .FirstOrDefaultAsync(e => e.EnrollmentId == dto.EnrollmentId);
 
             if (enrollment== null)
             {
@@ -58,7 +60,9 @@ namespace task_02_requirements_to_erd.Services
             };
 
             _context.Payments.Add(pay);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+
+            await _activityLogService.LogAsync(action:"Create" , entityName:"Payment" ,entityId: pay.PaymentId.ToString() ,description:$"payment {pay.PaymentId} was created");
 
             _logger.LogInformation("Payment {PaymentId} created for Enrollment {EnrollmentId}",pay.PaymentId, pay.EnrollmentId);
 
@@ -90,9 +94,9 @@ namespace task_02_requirements_to_erd.Services
         }
 
 
-        public PaymentResponse Update(int id, UpdatePaymentDto dto)
+        public async Task<PaymentResponse> Update(int id, UpdatePaymentDto dto)
         {
-            var pay=_context.Payments.FirstOrDefault(d=>d.PaymentId== id);
+            var pay=await _context.Payments.FirstOrDefaultAsync(d=>d.PaymentId== id);
             
             if (pay == null)
                 return null;
@@ -101,13 +105,20 @@ namespace task_02_requirements_to_erd.Services
 
             pay.PaymentStatus = dto.PaymentStatus;
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             _logger.LogInformation("Payment {PaymentId} status changed from {OldStatus} to {NewStatus}",
                     pay.PaymentId,
                     old,
                     pay.PaymentStatus
             );
+
+            await _activityLogService.LogAsync(
+                action:"update",
+                entityName:"payment",
+                entityId:pay.PaymentId.ToString(),
+                description:$"Payment {pay.PaymentId} updated its status from {old} to {pay.PaymentStatus}"
+                );
 
             return new PaymentResponse { PaymentStatus = pay.PaymentStatus };
         }

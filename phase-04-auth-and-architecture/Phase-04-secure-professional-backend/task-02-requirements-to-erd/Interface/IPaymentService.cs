@@ -7,8 +7,8 @@ namespace task_02_requirements_to_erd.Interface
     {
         List<PaymentResponse> GetAll(DateOnly? FromDate ,DateOnly? ToDate,PaymentStatus? status);
         //PaymentResponse GetPayment(int id);
-        PaymentResponse Create(CreatePaymentDto dto);
-        PaymentResponse Update(int id,UpdatePaymentDto dto);
+        Task<PaymentResponse> Create(CreatePaymentDto dto);
+        Task<PaymentResponse> Update(int id,UpdatePaymentDto dto);
 
         List<PaymentResponse> GetByEnrollmentId(int id);
     }

@@ -17,6 +17,7 @@ namespace task_02_requirements_to_erd.Services
 
         public DashboardSummaryDto GetDashboardSummary()
         {
+
             return new DashboardSummaryDto
             {
                 TotalStudents = _context.Students.Count(),

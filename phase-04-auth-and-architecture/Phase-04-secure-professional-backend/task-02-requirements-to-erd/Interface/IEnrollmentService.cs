@@ -9,7 +9,7 @@ namespace task_02_requirements_to_erd.Interface
 
         EnrollmentResponseDto Details(int id);
         EnrollmentResponseDto Create(CreateEnrollmentDto dto);
-        EnrollmentResponseDto UpdateStatus(int id, EnrollmentStatus status);
+        Task<EnrollmentResponseDto> UpdateStatus(int id, EnrollmentStatus status);
 
         List<EnrollmentResponseDto> GetStudentById(int id);
         List<StudentResponse> GetTracksById(int id);

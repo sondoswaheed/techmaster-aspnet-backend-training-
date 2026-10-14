@@ -188,28 +188,34 @@ namespace task_02_requirements_to_erd
             // Authentication service
             builder.Services.AddScoped<IAuthService, AuthService>();
 
+            //ActivityLog service
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddScoped<ActivityLogService>();
+
             var app = builder.Build();
 
-            // Swagger
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseMiddleware<GlobalExceptionMiddleware>();
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
 
             app.UseHttpsRedirection();
-            app.UseMiddleware<GlobalExceptionMiddleware>();
-            // IMPORTANT ORDER
+
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();
 
-            // Seed roles
-
             using (var scope = app.Services.CreateScope())
             {
-                await IdentitySeeder.SeedAsync(
-                    scope.ServiceProvider);
+                await IdentitySeeder.SeedAsync(scope.ServiceProvider);
             }
+
             app.Run();
+
         }
     }
 }

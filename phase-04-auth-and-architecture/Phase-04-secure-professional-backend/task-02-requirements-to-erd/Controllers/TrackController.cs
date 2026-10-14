@@ -43,11 +43,11 @@ public class TracksController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public IActionResult Create([FromForm]CreateTrackDto dto)
+    public async Task<IActionResult> Create([FromForm]CreateTrackDto dto)
     {
         try
         {
-            var result = _trainingService.Create(dto);
+            var result =await _trainingService.Create(dto);
 
             return StatusCode(201, ApiResponse<TrainingTrackResponse>.SuccessResponse(result, "Tracks created successfully"));
         }
